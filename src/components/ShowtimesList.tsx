@@ -1,36 +1,58 @@
-'use client'
-
-import { useState, useEffect } from 'react'
-import { format, parseISO, startOfWeek, endOfWeek, addWeeks, isSameDay } from 'date-fns'
+import { format, startOfWeek, endOfWeek, addWeeks } from 'date-fns'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { db } from '@/config/firebase'
+import { collection, query, and, where, Timestamp, getDocs, doc, getDoc } from 'firebase/firestore'
 
-// Mock data for showtimes (in a real application, this would come from an API)
-const mockShowtimes = [
-  { id: 1, movieId: 1, movieTitle: 'Inception', datetime: '2024-12-25T18:00:00' },
-  { id: 2, movieId: 1, movieTitle: 'Inception', datetime: '2024-12-25T21:00:00' },
-  { id: 3, movieId: 2, movieTitle: 'The Dark Knight', datetime: '2024-12-26T19:00:00' },
-  { id: 4, movieId: 3, movieTitle: 'Interstellar', datetime: '2024-12-27T20:00:00' },
-  { id: 5, movieId: 2, movieTitle: 'The Dark Knight', datetime: '2024-12-28T18:30:00' },
-  { id: 6, movieId: 1, movieTitle: 'Inception', datetime: '2024-12-29T17:00:00' },
-  { id: 7, movieId: 3, movieTitle: 'Interstellar', datetime: '2024-12-30T19:30:00' },
-  { id: 8, movieId: 2, movieTitle: 'The Dark Knight', datetime: '2024-12-31T20:00:00' },
-  { id: 9, movieId: 1, movieTitle: 'Inception', datetime: '2025-01-01T18:00:00' },
-  { id: 10, movieId: 3, movieTitle: 'Interstellar', datetime: '2025-01-02T21:00:00' },
-]
 
-type GroupedShowtimes = {
-  [date: string]: Array<{
-    id: number
-    movieId: number
-    movieTitle: string
-    datetime: string
-  }>
+
+interface Showtime {
+  id: string
+  date: Date
+  movieId: string
+  startTime: Date
+  theaterId: string
+  movieTitle: string
 }
 
-const groupShowtimesByDay = (showtimes: typeof mockShowtimes, startDate: Date, endDate: Date): GroupedShowtimes => {
+type GroupedShowtimes = {
+  [date: string]: Showtime[]
+}
+
+async function getShowtimes(theaterId: string, startDate: Date): Promise<Showtime[]> {
+  const schedCollectionRef = collection(db, "schedule")
+  const q = query(
+    schedCollectionRef,
+    and(
+      where("date", ">=", Timestamp.fromDate(startDate)),
+      where("theaterId", "==", theaterId)
+    )
+  )
+  const scheduleSnapshot = await getDocs(q)
+  const scheduleList = await Promise.all(
+    scheduleSnapshot.docs.map(async (sched) => {
+      const movieId = sched.data().movieId
+      const movieRef = doc(db, "movies", movieId)
+      const movieSnapshot = await getDoc(movieRef)
+      const movieTitle = movieSnapshot.exists()
+        ? movieSnapshot.data().name
+        : "Error getting movie title"
+      return {
+        id: sched.id,
+        date: sched.data().date.toDate(),
+        movieId,
+        startTime: sched.data().startTime.toDate(),
+        theaterId: sched.data().theaterId,
+        movieTitle,
+      } as Showtime
+    })
+  )
+  return scheduleList  
+}
+
+const groupShowtimesByDay = (showtimes: Showtime[], startDate: Date, endDate: Date): GroupedShowtimes => {
   return showtimes.reduce((acc, showtime) => {
-    const date = parseISO(showtime.datetime)
+    const date = showtime.date
     if (date >= startDate && date <= endDate) {
       const dayKey = format(date, 'yyyy-MM-dd')
       if (!acc[dayKey]) {
@@ -42,20 +64,15 @@ const groupShowtimesByDay = (showtimes: typeof mockShowtimes, startDate: Date, e
   }, {} as GroupedShowtimes)
 }
 
-export function ShowtimesList() {
-  const [thisWeekShowtimes, setThisWeekShowtimes] = useState<GroupedShowtimes>({})
-  const [nextWeekShowtimes, setNextWeekShowtimes] = useState<GroupedShowtimes>({})
+export function ShowtimesList({showtimes}: {showtimes: Showtime[]}) {
+  const now = new Date('2024-12-20')
+  const thisWeekStart = startOfWeek(now)
+  const thisWeekEnd = endOfWeek(now)
+  const nextWeekStart = addWeeks(thisWeekStart, 1)
+  const nextWeekEnd = endOfWeek(nextWeekStart)
 
-  useEffect(() => {
-    const now = new Date('2024-12-25')
-    const thisWeekStart = startOfWeek(now)
-    const thisWeekEnd = endOfWeek(now)
-    const nextWeekStart = addWeeks(thisWeekStart, 1)
-    const nextWeekEnd = endOfWeek(nextWeekStart)
-
-    setThisWeekShowtimes(groupShowtimesByDay(mockShowtimes, thisWeekStart, thisWeekEnd))
-    setNextWeekShowtimes(groupShowtimesByDay(mockShowtimes, nextWeekStart, nextWeekEnd))
-  }, [])
+  const thisWeekShowtimes = groupShowtimesByDay(showtimes, thisWeekStart, thisWeekEnd)
+  const nextWeekShowtimes = groupShowtimesByDay(showtimes, nextWeekStart, nextWeekEnd)
 
   const renderShowtimes = (groupedShowtimes: GroupedShowtimes) => {
     if (Object.keys(groupedShowtimes).length === 0) {
@@ -65,14 +82,14 @@ export function ShowtimesList() {
     return Object.entries(groupedShowtimes).map(([date, showtimes]) => (
       <Card key={date} className="mb-6">
         <CardHeader>
-          <CardTitle>{format(parseISO(date), 'EEEE, MMMM d')}</CardTitle>
+          <CardTitle>{format(showtimes[0].date, 'EEEE, MMMM d')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-2">
             {showtimes.map((showtime) => (
-              <div key={showtime.id} className="flex justify-between items-center">
+              <div key={`${showtime.movieId}-${showtime.startTime.getTime()}`} className="flex justify-between items-center">
                 <span className="font-medium">{showtime.movieTitle}</span>
-                <span>{format(parseISO(showtime.datetime), 'h:mm a')}</span>
+                <span>{format(showtime.startTime, 'h:mm a')}</span>
               </div>
             ))}
           </div>

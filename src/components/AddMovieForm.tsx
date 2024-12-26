@@ -6,31 +6,19 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-
-type MovieFormData = {
-  name: string
-  year: number
-  bigImage: string
-  smallImage: string
-  description: string
-  genre: string
-  duration: number
-  imdbRating: number
-  rottenTomatoesRating: number
-}
+import { addMovie } from '@/actions/actions'
+import { Movie } from '@/lib/definitions'
 
 export function AddMovieForm() {
-  const { register, handleSubmit, formState: { errors } } = useForm<MovieFormData>()
+  const { register, handleSubmit, formState: { errors } } = useForm<Movie>()
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const onSubmit = async (data: MovieFormData) => {
+  const onSubmit = async (data: Movie) => {
     setIsSubmitting(true)
-    // Here you would typically send this data to your backend
     console.log(data)
-    // Simulate an API call
-    await new Promise(resolve => setTimeout(resolve, 1000))
+    await addMovie(data)
+    console.log("less go")
     setIsSubmitting(false)
-    // Reset form or show success message
   }
 
   return (
