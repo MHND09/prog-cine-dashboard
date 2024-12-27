@@ -5,7 +5,7 @@ import { Showtime } from '@/lib/definitions';
 import { and, collection, doc, getDoc, getDocs, query, Timestamp, where } from 'firebase/firestore';
 
 export default async function ShowtimesPage() {
-  const scheduleList = await fetchShowtimes("pc0uCwNTM3sGYqNEaoCq", new Date("2024-12-20"))
+  const scheduleList = await fetchShowtimes("pc0uCwNTM3sGYqNEaoCq", new Date("2024-12-19"))
   console.log(scheduleList)
   // yeah you guessed it, I'll be passing that prop 3 components deep
   return (

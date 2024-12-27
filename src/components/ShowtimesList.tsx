@@ -1,8 +1,23 @@
 import { format, startOfWeek, endOfWeek, addWeeks } from 'date-fns'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Button } from '@/components/ui/button'
+import { Pencil, Trash2 } from 'lucide-react'
+import Link from 'next/link'
+import { useState } from 'react'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 import { db } from '@/config/firebase'
 import { collection, query, and, where, Timestamp, getDocs, doc, getDoc } from 'firebase/firestore'
+import { deleteShowtime } from '@/actions/actions'
 
 
 
@@ -65,6 +80,9 @@ const groupShowtimesByDay = (showtimes: Showtime[], startDate: Date, endDate: Da
 }
 
 export function ShowtimesList({showtimes}: {showtimes: Showtime[]}) {
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+  const [showtimeToDelete, setShowtimeToDelete] = useState<Showtime | null>(null)
+
   const now = new Date('2024-12-20')
   const thisWeekStart = startOfWeek(now)
   const thisWeekEnd = endOfWeek(now)
@@ -73,6 +91,21 @@ export function ShowtimesList({showtimes}: {showtimes: Showtime[]}) {
 
   const thisWeekShowtimes = groupShowtimesByDay(showtimes, thisWeekStart, thisWeekEnd)
   const nextWeekShowtimes = groupShowtimesByDay(showtimes, nextWeekStart, nextWeekEnd)
+
+  const handleDeleteClick = (showtime: Showtime) => {
+    setShowtimeToDelete(showtime)
+    setIsDeleteDialogOpen(true)
+  }
+
+  const handleDeleteConfirm = () => {
+    if (showtimeToDelete) {
+      console.log(`Deleting showtime with id: ${showtimeToDelete.id}`)
+      deleteShowtime(showtimeToDelete.id)
+    }
+    setIsDeleteDialogOpen(false)
+    setShowtimeToDelete(null)
+  }
+
 
   const renderShowtimes = (groupedShowtimes: GroupedShowtimes) => {
     if (Object.keys(groupedShowtimes).length === 0) {
@@ -87,9 +120,19 @@ export function ShowtimesList({showtimes}: {showtimes: Showtime[]}) {
         <CardContent>
           <div className="space-y-2">
             {showtimes.map((showtime) => (
-              <div key={`${showtime.movieId}-${showtime.startTime.getTime()}`} className="flex justify-between items-center">
+              <div key={`${showtime.id}`} className="flex justify-between items-center">
                 <span className="font-medium">{showtime.movieTitle}</span>
-                <span>{format(showtime.startTime, 'h:mm a')}</span>
+                <div className="flex items-center space-x-2">
+                  <span>{format(showtime.startTime, 'h:mm a')}</span>
+                  <Link href={`/showtimes?edit=${showtime.id}`} passHref>
+                    <Button variant="ghost" size="icon">
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                  </Link>
+                  <Button variant="ghost" size="icon" onClick={() => handleDeleteClick(showtime)}>
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
             ))}
           </div>
@@ -99,6 +142,7 @@ export function ShowtimesList({showtimes}: {showtimes: Showtime[]}) {
   }
 
   return (
+    <>
     <Tabs defaultValue="this-week" className="w-full">
       <TabsList className="grid w-full grid-cols-2">
         <TabsTrigger value="this-week">This Week</TabsTrigger>
@@ -111,6 +155,22 @@ export function ShowtimesList({showtimes}: {showtimes: Showtime[]}) {
         {renderShowtimes(nextWeekShowtimes)}
       </TabsContent>
     </Tabs>
+    <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Are you sure you want to delete this showtime?</AlertDialogTitle>
+          <AlertDialogDescription>
+            This action cannot be undone. This will permanently delete the showtime.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogAction className='bg-red-500 text-white
+          ' onClick={handleDeleteConfirm}>Delete</AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  </>
   )
 }
 

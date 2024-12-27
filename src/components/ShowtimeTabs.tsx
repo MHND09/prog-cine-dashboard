@@ -1,19 +1,28 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ShowtimesList } from '@/components/ShowtimesList'
 import { AddShowtimeForm } from '@/components/AddShowtimeForm'
+import { EditShowtimeForm } from '@/components/EditShowtimeForm'
 import { Showtime } from '@/lib/definitions'
 
 export function ShowtimeTabs({scheduleList}:{scheduleList: Showtime[]}) {
   const [activeTab, setActiveTab] = useState('all-showtimes')
-// TODO add scheduleList, theaterId, and movies props
+  const searchParams = useSearchParams();
+  const editShowtimeId = searchParams.get('edit')
+  useEffect(() => {
+    if (editShowtimeId) {
+      setActiveTab('edit-showtime')
+    }
+  }, [editShowtimeId])
   return (
     <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
       <TabsList>
         <TabsTrigger value="all-showtimes">All Showtimes</TabsTrigger>
         <TabsTrigger value="add-showtime">Add Showtime</TabsTrigger>
+        {editShowtimeId && <TabsTrigger value="edit-showtime">Edit Showtime</TabsTrigger>}
       </TabsList>
       <TabsContent value="all-showtimes">
         <ShowtimesList showtimes={scheduleList}/>
@@ -21,6 +30,11 @@ export function ShowtimeTabs({scheduleList}:{scheduleList: Showtime[]}) {
       <TabsContent value="add-showtime">
         <AddShowtimeForm />
       </TabsContent>
+      {editShowtimeId && (
+        <TabsContent value="edit-showtime">
+          <EditShowtimeForm showtimeId={editShowtimeId} />
+        </TabsContent>
+      )}
     </Tabs>
   )
 }

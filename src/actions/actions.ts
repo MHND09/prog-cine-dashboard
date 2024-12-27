@@ -1,8 +1,9 @@
 'use server';
 
 import { db } from "@/config/firebase";
-import { addDoc, collection, Timestamp } from "firebase/firestore";
+import { addDoc, collection, deleteDoc, doc, Timestamp, updateDoc } from "firebase/firestore";
 import { Movie } from "@/lib/definitions";
+import { revalidatePath } from "next/cache";
 
 
 type ShowtimeFormData = {
@@ -16,6 +17,15 @@ const addMovie = async (data:Movie) => {
     console.log(data);
     console.log(collectionRef);
     await addDoc(collectionRef, data);
+    revalidatePath('/movies')
+}
+
+export async function updateMovie(id: string, data: Movie) {
+  const docRef = doc(db, 'movies', id)
+  console.log(data);
+  await updateDoc(docRef, data)
+  console.log("Movie updated:", id)
+  revalidatePath('/movies')
 }
 
 
@@ -24,23 +34,12 @@ const addShowtime = async (theaterId:String, showtime:ShowtimeFormData) => {
   const collectionRef = collection(db, "/scheduleTestD");
   console.log(showtime);
   console.log(theaterId);
-
-  // Parse the date
   const [year, month, day] = showtime.date.split('-').map(Number);
-
-  // Create a Date object for 12 AM
   const dateAtMidnight = new Date(year, month - 1, day, 0, 0);
-
-  // Parse the time
   const [hours, minutes] = showtime.time.split(':').map(Number);
-
-  // Create a Date object for the specified start time
   const dateWithStartTime = new Date(year, month - 1, day, hours, minutes);
-
-  // Convert to Firebase Timestamps
   const timestampDate = Timestamp.fromDate(dateAtMidnight);
   const timestampStartTime = Timestamp.fromDate(dateWithStartTime);
-
   const payload = {
     date: timestampDate,
     startTime: timestampStartTime,
@@ -50,6 +49,33 @@ const addShowtime = async (theaterId:String, showtime:ShowtimeFormData) => {
   console.log(payload);
   await addDoc(collectionRef, payload);
   console.log("Showtime added");
+  revalidatePath('/showtimes')
 }
 
-export{ addMovie, addShowtime}
+const deleteShowtime = async (schedId: string) => {
+  const docRef = doc(db, 'schedule', schedId)
+  await deleteDoc(docRef)
+  console.log("Showtime deleted:", schedId)
+  revalidatePath('/showtimes')
+}
+
+const editShowtime = async (schedId: string, data: ShowtimeFormData) => {
+  const docRef = doc(db, 'schedule', schedId)
+  const [year, month, day] = data.date.split('-').map(Number);
+  const dateAtMidnight = new Date(year, month - 1, day, 0, 0);
+  const [hours, minutes] = data.time.split(':').map(Number);
+  const dateWithStartTime = new Date(year, month - 1, day, hours, minutes);
+  const timestampDate = Timestamp.fromDate(dateAtMidnight);
+  const timestampStartTime = Timestamp.fromDate(dateWithStartTime);
+  const payload = {
+    date: timestampDate,
+    startTime: timestampStartTime,
+    movieId: data.movieId,
+  }
+  await updateDoc(docRef, payload)
+  console.log("Showtime updated:", schedId)
+  revalidatePath('/showtimes')
+}
+
+
+export{ addMovie, addShowtime, deleteShowtime, editShowtime}
