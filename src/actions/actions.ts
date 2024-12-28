@@ -13,7 +13,7 @@ type ShowtimeFormData = {
 }
 
 const addMovie = async (data:Movie) => {
-    const collectionRef = collection(db, "moviesTestD");
+    const collectionRef = collection(db, "movies");
     console.log(data);
     console.log(collectionRef);
     await addDoc(collectionRef, data);
