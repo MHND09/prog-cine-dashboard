@@ -38,17 +38,8 @@ export function AddMovieForm() {
       <Textarea {...register('description', { required: 'Description is required' })} placeholder="Description" />
       {errors.description && <p className="text-red-500">{errors.description.message}</p>}
 
-      <Select onValueChange={(value) => register('genre').onChange({ target: { value } })}>
-        <SelectTrigger>
-          <SelectValue placeholder="Select genre" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="action">Action</SelectItem>
-          <SelectItem value="comedy">Comedy</SelectItem>
-          <SelectItem value="drama">Drama</SelectItem>
-          <SelectItem value="scifi">Sci-Fi</SelectItem>
-        </SelectContent>
-      </Select>
+      <Input {...register('genre', { required: 'genre is required' })} placeholder="genre" />
+      {errors.smallImage && <p className="text-red-500">{errors.smallImage.message}</p>}
 
       <Input {...register('duration', { required: 'Duration is required', min: 1 })} type="number" placeholder="Duration (minutes)" />
       {errors.duration && <p className="text-red-500">{errors.duration.message}</p>}

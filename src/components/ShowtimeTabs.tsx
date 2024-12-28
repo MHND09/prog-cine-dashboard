@@ -8,7 +8,7 @@ import { AddShowtimeForm } from '@/components/AddShowtimeForm'
 import { EditShowtimeForm } from '@/components/EditShowtimeForm'
 import { Showtime } from '@/lib/definitions'
 
-export function ShowtimeTabs({scheduleList}:{scheduleList: Showtime[]}) {
+export function ShowtimeTabs({scheduleList, theaterId}:{scheduleList: Showtime[], theaterId: string}) {
   const [activeTab, setActiveTab] = useState('all-showtimes')
   const searchParams = useSearchParams();
   const editShowtimeId = searchParams.get('edit')
@@ -28,7 +28,7 @@ export function ShowtimeTabs({scheduleList}:{scheduleList: Showtime[]}) {
         <ShowtimesList showtimes={scheduleList}/>
       </TabsContent>
       <TabsContent value="add-showtime">
-        <AddShowtimeForm />
+        <AddShowtimeForm theaterId={theaterId}/>
       </TabsContent>
       {editShowtimeId && (
         <TabsContent value="edit-showtime">

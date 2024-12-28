@@ -23,7 +23,6 @@ type EditShowtimeFormProps = {
 
 
 export function EditShowtimeForm({ showtimeId }: EditShowtimeFormProps) {
-  const theaterId = 'pc0uCwNTM3sGYqNEaoCq';
   const { register, handleSubmit, formState: { errors }, setValue, watch } = useForm<ShowtimeFormData>()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isLoading, setIsLoading] = useState(true)

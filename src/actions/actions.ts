@@ -31,7 +31,7 @@ export async function updateMovie(id: string, data: Movie) {
 
 const addShowtime = async (theaterId:String, showtime:ShowtimeFormData) => {
   
-  const collectionRef = collection(db, "/scheduleTestD");
+  const collectionRef = collection(db, "/schedule");
   console.log(showtime);
   console.log(theaterId);
   const [year, month, day] = showtime.date.split('-').map(Number);

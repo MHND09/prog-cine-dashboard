@@ -83,7 +83,7 @@ export function ShowtimesList({showtimes}: {showtimes: Showtime[]}) {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [showtimeToDelete, setShowtimeToDelete] = useState<Showtime | null>(null)
 
-  const now = new Date('2024-12-20')
+  const now = new Date()
   const thisWeekStart = startOfWeek(now)
   const thisWeekEnd = endOfWeek(now)
   const nextWeekStart = addWeeks(thisWeekStart, 1)

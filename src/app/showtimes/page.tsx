@@ -3,28 +3,35 @@ import { ShowtimeTabs } from '@/components/ShowtimeTabs';
 import { db } from '@/config/firebase';
 import { Showtime } from '@/lib/definitions';
 import { and, collection, doc, getDoc, getDocs, query, Timestamp, where } from 'firebase/firestore';
+import { clerkClient } from '@clerk/nextjs/server'
+import { auth } from '@clerk/nextjs/server'
 
 export default async function ShowtimesPage() {
-  const scheduleList = await fetchShowtimes("pc0uCwNTM3sGYqNEaoCq", new Date("2024-12-19"))
+  const {userId} = await auth();
+  const client = await clerkClient();
+  const user = await client.users.getUser(userId as string);
+  const theaterId = typeof user.privateMetadata?.theater_id === 'string' ? user.privateMetadata.theater_id : process.env.DEFAULT_THEATER_ID as string;
+  const scheduleList = await fetchShowtimes(theaterId, new Date())
   console.log(scheduleList)
   // yeah you guessed it, I'll be passing that prop 3 components deep
   return (
     <div className="container mx-auto py-8">
       <h1 className="text-3xl font-bold mb-8">Showtimes</h1>
-      <ShowtimeTabs scheduleList={scheduleList}/>
+      <ShowtimeTabs scheduleList={scheduleList} theaterId={theaterId}/>
     </div>
   )
 }
 
 async function fetchShowtimes(
   theaterId: string,
-  startDate: Date
+  startDate: Date,
 ): Promise<Showtime[]> {
+  console.log(startDate)
   const schedCollectionRef = collection(db, "schedule")
   const q = query(
     schedCollectionRef,
     and(
-      where("date", ">=", Timestamp.fromDate(startDate)),
+      where("startTime", ">=", Timestamp.fromDate(startDate)),
       where("theaterId", "==", theaterId)
     )
   )

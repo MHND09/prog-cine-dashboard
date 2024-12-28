@@ -15,9 +15,8 @@ type ShowtimeFormData = {
   date: String
   time: String
 }
-const theaterId = 'pc0uCwNTM3sGYqNEaoCq';
 
-export function AddShowtimeForm() {
+export function AddShowtimeForm({ theaterId }: { theaterId: string }) {
   const [movies, setMovies] = useState<Movie[]>([])
   useEffect(() => {
     const fetchMovies = async () => {
