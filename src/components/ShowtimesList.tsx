@@ -15,8 +15,6 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
-import { db } from '@/config/firebase'
-import { collection, query, and, where, Timestamp, getDocs, doc, getDoc } from 'firebase/firestore'
 import { deleteShowtime } from '@/actions/actions'
 
 
@@ -34,36 +32,6 @@ type GroupedShowtimes = {
   [date: string]: Showtime[]
 }
 
-async function getShowtimes(theaterId: string, startDate: Date): Promise<Showtime[]> {
-  const schedCollectionRef = collection(db, "schedule")
-  const q = query(
-    schedCollectionRef,
-    and(
-      where("date", ">=", Timestamp.fromDate(startDate)),
-      where("theaterId", "==", theaterId)
-    )
-  )
-  const scheduleSnapshot = await getDocs(q)
-  const scheduleList = await Promise.all(
-    scheduleSnapshot.docs.map(async (sched) => {
-      const movieId = sched.data().movieId
-      const movieRef = doc(db, "movies", movieId)
-      const movieSnapshot = await getDoc(movieRef)
-      const movieTitle = movieSnapshot.exists()
-        ? movieSnapshot.data().name
-        : "Error getting movie title"
-      return {
-        id: sched.id,
-        date: sched.data().date.toDate(),
-        movieId,
-        startTime: sched.data().startTime.toDate(),
-        theaterId: sched.data().theaterId,
-        movieTitle,
-      } as Showtime
-    })
-  )
-  return scheduleList  
-}
 
 const groupShowtimesByDay = (showtimes: Showtime[], startDate: Date, endDate: Date): GroupedShowtimes => {
   return showtimes.reduce((acc, showtime) => {

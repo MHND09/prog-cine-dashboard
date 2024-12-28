@@ -12,8 +12,8 @@ import { addShowtime } from '@/actions/actions'
 
 type ShowtimeFormData = {
   movieId: string
-  date: String
-  time: String
+  date: string
+  time: string
 }
 
 export function AddShowtimeForm({ theaterId }: { theaterId: string }) {

@@ -11,8 +11,8 @@ export default async function DashboardPage() {
     name = "Admin"
   }
   else{
-    // the username is given is of the form user_name we need to replace _ with space and capitalize the first letter of each word
-    name = user.username?.split('_').map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')!;
+    name = user.username ?? "User";
+    name = name.split('_').map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
   }
   console.log(name);
   return (

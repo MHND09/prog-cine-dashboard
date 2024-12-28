@@ -5,7 +5,6 @@ import { useForm } from 'react-hook-form'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { addMovie } from '@/actions/actions'
 import { Movie } from '@/lib/definitions'
 
@@ -44,7 +43,7 @@ export function AddMovieForm() {
       <Input {...register('duration', { required: 'Duration is required', min: 1 })} type="number" placeholder="Duration (minutes)" />
       {errors.duration && <p className="text-red-500">{errors.duration.message}</p>}
 
-      <Input {...register('imdbRating', { required: 'IMDB Rating is required', min: 0, max: 10, step: 0.1 })} type="number" step="0.1" placeholder="IMDB Rating" />
+      <Input {...register('imdbRating', { required: 'IMDB Rating is required', min: 0, max: 10 })} type="number" step="0.1" placeholder="IMDB Rating" />
       {errors.imdbRating && <p className="text-red-500">{errors.imdbRating.message}</p>}
 
       <Input {...register('rottenTomatoesRating', { required: 'Rotten Tomatoes Rating is required', min: 0, max: 100 })} type="number" placeholder="Rotten Tomatoes Rating" />

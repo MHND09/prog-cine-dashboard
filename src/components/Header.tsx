@@ -1,4 +1,3 @@
-import { Bell, User } from 'lucide-react'
 import { SignInButton, SignedIn, SignedOut, UserButton } from '@clerk/nextjs'
 
 export function Header() {

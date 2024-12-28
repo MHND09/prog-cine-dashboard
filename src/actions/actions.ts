@@ -8,8 +8,8 @@ import { revalidatePath } from "next/cache";
 
 type ShowtimeFormData = {
   movieId: string
-  date: String
-  time: String
+  date: string
+  time: string
 }
 
 const addMovie = async (data:Movie) => {
@@ -29,7 +29,7 @@ export async function updateMovie(id: string, data: Movie) {
 }
 
 
-const addShowtime = async (theaterId:String, showtime:ShowtimeFormData) => {
+const addShowtime = async (theaterId:string, showtime:ShowtimeFormData) => {
   
   const collectionRef = collection(db, "/schedule");
   console.log(showtime);

@@ -6,8 +6,7 @@ import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { getFirestore, doc, getDoc } from 'firebase/firestore'
+import { doc, getDoc } from 'firebase/firestore'
 import { db } from '@/config/firebase'
 import { Movie } from '@/lib/definitions'
 import { updateMovie } from '@/actions/actions'
@@ -74,7 +73,7 @@ export function EditMovieForm({ movieId }: EditMovieFormProps) {
             <Input {...register('duration', { required: 'Duration is required', min: 1 })} type="number" placeholder="Duration (minutes)" />
             {errors.duration && <p className="text-red-500">{errors.duration.message}</p>}
 
-            <Input {...register('imdbRating', { required: 'IMDB Rating is required', min: 0, max: 10, step: 0.1 })} type="number" step="0.1" placeholder="IMDB Rating" />
+            <Input {...register('imdbRating', { required: 'IMDB Rating is required', min: 0, max: 10 })} type="number" step="0.1" placeholder="IMDB Rating" />
             {errors.imdbRating && <p className="text-red-500">{errors.imdbRating.message}</p>}
 
             <Input {...register('rottenTomatoesRating', { required: 'Rotten Tomatoes Rating is required', min: 0, max: 100 })} type="number" placeholder="Rotten Tomatoes Rating" />
