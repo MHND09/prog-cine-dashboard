@@ -70,3 +70,37 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+@layer utilities {
+  .search-form {
+    @apply max-w-3xl w-full min-h-[80px] bg-white border-[5px] border-blue-500 rounded-[80px] text-[24px] mt-8 px-5 flex flex-row items-center gap-5;
+  }
+
+  .search-input {
+    @apply flex-1 font-bold placeholder:font-semibold placeholder:text-[24px]
+     w-full h-auto outline-none;
+  }
+
+  .search-btn {
+    @apply size-[50px] rounded-full bg-blue-500 flex justify-center items-center !important;
+  }
+
+  .document-list-container {
+    @apply flex flex-col items-center mb-10 w-full gap-6 px-5;
+  }
+
+  .document-list-title {
+    @apply max-w-[730px] items-end flex w-full justify-between;
+  }
+
+  .document-list-item {
+    @apply flex items-center justify-between gap-4 rounded-lg bg-gray-200 bg-cover p-5 shadow-xl;
+  }
+  .document-ul {
+    @apply flex w-full max-w-[730px] flex-col gap-5;
+  }
+
+  .document-list-empty {
+    @apply flex w-full max-w-[730px] flex-col items-center justify-center gap-5 rounded-lg bg-gray-200 px-10 py-8;
+  }
+}

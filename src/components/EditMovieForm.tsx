@@ -1,57 +1,39 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useRouter } from 'next/navigation'
+import { Movie } from '@/lib/definitions'
+import { updateMovie } from '@/actions/actions'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
-import { doc, getDoc } from 'firebase/firestore'
-import { db } from '@/config/firebase'
-import { Movie } from '@/lib/definitions'
-import { updateMovie } from '@/actions/actions'
 
 type EditMovieFormProps = {
-    movieId: string
+  movieId: string
+  movie: Movie
 }
 
-export function EditMovieForm({ movieId }: EditMovieFormProps) {
-    const { register, handleSubmit, formState: { errors }, setValue } = useForm<Movie>()
-    const [isSubmitting, setIsSubmitting] = useState(false)
-    const router = useRouter()
+export function EditMovieForm({ movieId, movie }: EditMovieFormProps) {
+  const { register, handleSubmit, formState: { errors } } = useForm<Movie>({
+    defaultValues: movie
+  })
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const router = useRouter()
 
-    useEffect(() => {
-        const fetchMovie = async () => {
+  const onSubmit = async (data: Movie) => {
+    setIsSubmitting(true)
+    await updateMovie(movieId, data)
+    setIsSubmitting(false)
+    router.push('/movies')
+  }
 
-            const movieDoc = doc(db, 'movies', movieId)
-            const movieSnapshot = await getDoc(movieDoc)
-            if (!movieSnapshot.exists()) {
-                console.error('No such document!')
-                return
-            }
-            const movie = movieSnapshot.data() as Movie
-            Object.entries(movie).forEach(([key, value]) => {
-                setValue(key as keyof Movie, value)
-            })
-        }
+  const handleCancel = () => {
+    router.push('/movies')
+  }
 
-        fetchMovie()
-    }, [movieId, setValue])
-
-    const onSubmit = async (data: Movie) => {
-        setIsSubmitting(true)
-        console.log("submitting data to server")
-        console.log(data)
-        await updateMovie(movieId, data)
-        setIsSubmitting(false)
-        router.push('/movies')
-    }
-    const handleCancel = () => {
-        router.push('/movies')
-    }
-
-    return (
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+  return (
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <Input {...register('name', { required: 'Movie name is required' })} placeholder="Movie Name" />
             {errors.name && <p className="text-red-500">{errors.name.message}</p>}
 
@@ -88,6 +70,5 @@ export function EditMovieForm({ movieId }: EditMovieFormProps) {
                 </Button>
             </div>
         </form>
-    )
+  )
 }
-

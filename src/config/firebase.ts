@@ -1,19 +1,40 @@
+import admin from "firebase-admin";
 
-import { initializeApp } from "firebase/app";
-import { getFirestore } from "firebase/firestore";
+interface FirebaseAdminAppParams {
+  projectId: string;
+  clientEmail: string;
+  privateKey: string;
+}
 
-const firebaseConfig = {
-    apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-    authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-    projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-    storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-    messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-    appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
-    measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
+function formatPrivateKey(key: string) {
+  return key.replace(/\\n/g, "\n");
+}
+
+export function createFirebaseAdminApp(params: FirebaseAdminAppParams) {
+  const privateKey = formatPrivateKey(params.privateKey);
+
+  if (admin.apps.length > 0) {
+    return admin.app();
   }
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+  const cert = admin.credential.cert({
+    projectId: params.projectId,
+    clientEmail: params.clientEmail,
+    privateKey,
+  });
 
-export { db };
-export default app;
+  return admin.initializeApp({
+    credential: cert,
+    projectId: params.projectId,
+  });
+}
+
+export async function initAdmin() {
+  const params = {
+    projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID as string,
+    clientEmail: process.env.FIREBASE_CLIENT_EMAIL as string,
+    privateKey: process.env.FIREBASE_PRIVATE_KEY as string,
+  };
+
+  return createFirebaseAdminApp(params);
+}

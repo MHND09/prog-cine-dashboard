@@ -1,3 +1,4 @@
+"use client"
 import { format, startOfWeek, endOfWeek, addWeeks } from 'date-fns'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -51,7 +52,7 @@ export function ShowtimesList({showtimes}: {showtimes: Showtime[]}) {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [showtimeToDelete, setShowtimeToDelete] = useState<Showtime | null>(null)
 
-  const now = new Date()
+  const now = new Date(2024, 11, 20)
   const thisWeekStart = startOfWeek(now)
   const thisWeekEnd = endOfWeek(now)
   const nextWeekStart = addWeeks(thisWeekStart, 1)
@@ -92,11 +93,11 @@ export function ShowtimesList({showtimes}: {showtimes: Showtime[]}) {
                 <span className="font-medium">{showtime.movieTitle}</span>
                 <div className="flex items-center space-x-2">
                   <span>{format(showtime.startTime, 'h:mm a')}</span>
-                  <Link href={`/showtimes?edit=${showtime.id}`} passHref>
+                  <a href={`/showtimes?edit=${showtime.id}`}>
                     <Button variant="ghost" size="icon">
                       <Pencil className="h-4 w-4" />
                     </Button>
-                  </Link>
+                  </a>
                   <Button variant="ghost" size="icon" onClick={() => handleDeleteClick(showtime)}>
                     <Trash2 className="h-4 w-4" />
                   </Button>

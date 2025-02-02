@@ -1,7 +1,7 @@
 'use server';
 
-import { db } from "@/config/firebase";
-import { addDoc, collection, deleteDoc, doc, Timestamp, updateDoc } from "firebase/firestore";
+import { getFirestore, Timestamp } from "firebase-admin/firestore";
+//import { addDoc, collection, deleteDoc, doc, Timestamp, updateDoc } from "firebase/firestore";
 import { Movie } from "@/lib/definitions";
 import { revalidatePath } from "next/cache";
 
@@ -11,27 +11,34 @@ type ShowtimeFormData = {
   date: string
   time: string
 }
+const addMovieImdb = async (imdbId: string) => {
+
+}
+
+
 
 const addMovie = async (data:Movie) => {
-    const collectionRef = collection(db, "movies");
+    const firestore = getFirestore();
+    const collectionRef = firestore.collection("movies");
     console.log(data);
     console.log(collectionRef);
-    await addDoc(collectionRef, data);
+    await collectionRef.add(data);
     revalidatePath('/movies')
 }
 
 export async function updateMovie(id: string, data: Movie) {
-  const docRef = doc(db, 'movies', id)
+  const firestore = getFirestore();
+  const docRef = firestore.collection("movies").doc(id);
   console.log(data);
-  await updateDoc(docRef, data)
-  console.log("Movie updated:", id)
-  revalidatePath('/movies')
+  await docRef.update(data);
+  console.log("Movie updated:", id);
+  revalidatePath('/movies');
 }
 
 
 const addShowtime = async (theaterId:string, showtime:ShowtimeFormData) => {
-  
-  const collectionRef = collection(db, "/schedule");
+  const firestore = getFirestore();
+  const collectionRef = firestore.collection("schedule");
   console.log(showtime);
   console.log(theaterId);
   const [year, month, day] = showtime.date.split('-').map(Number);
@@ -47,20 +54,23 @@ const addShowtime = async (theaterId:string, showtime:ShowtimeFormData) => {
     theaterId: theaterId
   }
   console.log(payload);
-  await addDoc(collectionRef, payload);
+  await collectionRef.add(payload);
   console.log("Showtime added");
   revalidatePath('/showtimes')
 }
 
 const deleteShowtime = async (schedId: string) => {
-  const docRef = doc(db, 'schedule', schedId)
-  await deleteDoc(docRef)
+  const firestore = getFirestore();
+  
+  const docRef = firestore.collection("schedule").doc(schedId);
+  await docRef.delete();
   console.log("Showtime deleted:", schedId)
   revalidatePath('/showtimes')
 }
 
 const editShowtime = async (schedId: string, data: ShowtimeFormData) => {
-  const docRef = doc(db, 'schedule', schedId)
+  const firestore = getFirestore();
+  const docRef = firestore.collection("schedule").doc(schedId);
   const [year, month, day] = data.date.split('-').map(Number);
   const dateAtMidnight = new Date(year, month - 1, day, 0, 0);
   const [hours, minutes] = data.time.split(':').map(Number);
@@ -72,10 +82,10 @@ const editShowtime = async (schedId: string, data: ShowtimeFormData) => {
     startTime: timestampStartTime,
     movieId: data.movieId,
   }
-  await updateDoc(docRef, payload)
+  await docRef.update(payload);
   console.log("Showtime updated:", schedId)
   revalidatePath('/showtimes')
 }
 
 
-export{ addMovie, addShowtime, deleteShowtime, editShowtime}
+export{ addMovie, addShowtime, deleteShowtime, editShowtime, addMovieImdb}

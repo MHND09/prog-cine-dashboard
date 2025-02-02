@@ -5,8 +5,6 @@ import { useForm } from 'react-hook-form'
 import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Input } from '@/components/ui/input'
-import { collection, getDocs } from 'firebase/firestore'
-import { db } from '@/config/firebase'
 import { Movie } from '@/lib/definitions'
 import { addShowtime } from '@/actions/actions'
 
@@ -16,20 +14,7 @@ type ShowtimeFormData = {
   time: string
 }
 
-export function AddShowtimeForm({ theaterId }: { theaterId: string }) {
-  const [movies, setMovies] = useState<Movie[]>([])
-  useEffect(() => {
-    const fetchMovies = async () => {
-      const moviesCollectionRef = collection(db, 'movies')
-      const moviesSnapshot = await getDocs(moviesCollectionRef)
-      const movies = moviesSnapshot.docs.map(doc => ({
-        ...doc.data(),
-        id: doc.id
-      } as Movie))
-      setMovies(movies)
-    }
-    fetchMovies()
-  }, [])
+export function AddShowtimeForm({ theaterId, movies }: { theaterId: string, movies:Movie[] }) {
 
   const { register, handleSubmit, setValue, formState: { errors } } = useForm<ShowtimeFormData>()
   const [isSubmitting, setIsSubmitting] = useState(false)
