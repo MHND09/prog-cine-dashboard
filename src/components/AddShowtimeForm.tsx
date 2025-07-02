@@ -53,8 +53,8 @@ export function AddShowtimeForm({ theaterId, movies }: { theaterId: string, movi
               <SelectValue placeholder="Select movie" />
             </SelectTrigger>
             <SelectContent >
-              {movies.map(movie => (
-                <SelectItem key={movie.id} value={movie.id}>{movie.name}</SelectItem>
+              {movies.filter(movie => movie.id).map(movie => (
+                <SelectItem key={movie.id} value={movie.id!}>{movie.name}</SelectItem>
               ))}
             </SelectContent>
           </Select>

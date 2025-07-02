@@ -67,8 +67,10 @@ export function EditShowtimeForm({ showtimeId, showtime, movies }: EditShowtimeF
               <SelectValue placeholder="Select movie" />
             </SelectTrigger>
             <SelectContent >
-              {movies.map(movie => (
-                <SelectItem key={movie.id} value={movie.id}>{movie.name}</SelectItem>
+              {movies
+                .filter(movie => movie.id !== undefined)
+                .map(movie => (
+                  <SelectItem key={movie.id} value={movie.id!}>{movie.name}</SelectItem>
               ))}
             </SelectContent>
           </Select>
