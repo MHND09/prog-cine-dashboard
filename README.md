@@ -1,4 +1,33 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Theater Dashboard
+
+A comprehensive dashboard application designed for theater owners to manage their content for a mobile app. This web-based management system allows theater owners to efficiently handle their movie listings, showtimes, and other content that will be displayed in their mobile application.
+
+## Project Overview
+
+This dashboard serves as the backend management interface for theater owners, providing them with tools to:
+
+- **Movie Management**: Add, edit, and remove movies from their theater listings
+- **Showtime Management**: Create and manage movie showtimes and schedules
+- **Content Control**: Full control over what content appears in their mobile app
+- **User-Friendly Interface**: Intuitive design built with modern web technologies
+
+## Technology Stack
+
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app), built with:
+
+- **Next.js 15+** - React framework with App Router
+- **TypeScript** - Type-safe development
+- **Tailwind CSS** - Utility-first CSS framework
+- **Supabase** - Backend database and authentication
+
+## Demo Credentials
+
+For reference and testing purposes, you can use the following credentials:
+
+```
+Email: cosmos_beta@progcine.co
+Password: SXSG0luJo4xdeKX
+```
 
 ## Getting Started
 
@@ -19,6 +48,32 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+
+## Features
+
+- **Movie Management**
+  - Add new movies with detailed information
+  - Edit existing movie details
+  - Search and import movies from external sources
+  - Manage movie metadata and images
+
+- **Showtime Management**
+  - Create and schedule movie showtimes
+  - Edit existing showtimes
+  - Manage theater schedules and availability
+
+- **Dashboard Overview**
+  - Real-time content management
+  - User-friendly navigation
+  - Responsive design for various devices
+
+## Project Structure
+
+- `/src/app` - Next.js App Router pages and layouts
+- `/src/components` - Reusable React components
+- `/src/actions` - Server actions for data operations
+- `/src/lib` - Utility functions and type definitions
+- `/src/utils` - Firebase and Supabase configurations
 
 ## Learn More
 
