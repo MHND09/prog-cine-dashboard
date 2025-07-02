@@ -1,57 +1,53 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useRouter } from 'next/navigation'
+import { Movie } from '@/lib/definitions'
+import { updateMovie } from '@/actions/actions'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
-import { doc, getDoc } from 'firebase/firestore'
-import { db } from '@/config/firebase'
-import { Movie } from '@/lib/definitions'
-import { updateMovie } from '@/actions/actions'
+import { AlertCircle } from 'lucide-react'
+import { Alert, AlertTitle, AlertDescription } from './ui/alert'
 
 type EditMovieFormProps = {
-    movieId: string
+  movieId: string
+  movie: Movie
 }
 
-export function EditMovieForm({ movieId }: EditMovieFormProps) {
-    const { register, handleSubmit, formState: { errors }, setValue } = useForm<Movie>()
-    const [isSubmitting, setIsSubmitting] = useState(false)
-    const router = useRouter()
+export function EditMovieForm({ movieId, movie }: EditMovieFormProps) {
+  const { register, handleSubmit,reset, formState: { errors } } = useForm<Movie>({
+    defaultValues: movie
+  })
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [successMessage, setSuccessMessage] = useState<string | null>(null)
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const router = useRouter()
 
-    useEffect(() => {
-        const fetchMovie = async () => {
-
-            const movieDoc = doc(db, 'movies', movieId)
-            const movieSnapshot = await getDoc(movieDoc)
-            if (!movieSnapshot.exists()) {
-                console.error('No such document!')
-                return
-            }
-            const movie = movieSnapshot.data() as Movie
-            Object.entries(movie).forEach(([key, value]) => {
-                setValue(key as keyof Movie, value)
-            })
-        }
-
-        fetchMovie()
-    }, [movieId, setValue])
-
-    const onSubmit = async (data: Movie) => {
-        setIsSubmitting(true)
-        console.log("submitting data to server")
-        console.log(data)
-        await updateMovie(movieId, data)
-        setIsSubmitting(false)
-        router.push('/movies')
+  const onSubmit = async (data: Movie) => {
+    setIsSubmitting(true)
+    setSuccessMessage(null)
+    setErrorMessage(null)
+    const {error} = await updateMovie(movieId, data)
+    if (error) {
+      setErrorMessage('An error occurred while updating the movie. Please try again. If the problem persists, contact support.')
     }
-    const handleCancel = () => {
-        router.push('/movies')
+    else{
+      setSuccessMessage('Movie updated successfully')
+      reset()
     }
+    setIsSubmitting(false)
+  }
 
-    return (
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+  const handleCancel = () => {
+    router.push('/movies')
+  }
+
+  return (
+    <>
+    
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <Input {...register('name', { required: 'Movie name is required' })} placeholder="Movie Name" />
             {errors.name && <p className="text-red-500">{errors.name.message}</p>}
 
@@ -88,6 +84,21 @@ export function EditMovieForm({ movieId }: EditMovieFormProps) {
                 </Button>
             </div>
         </form>
-    )
-}
+        {successMessage && (
+        <Alert variant="default" className="mt-4 bg-green-100 text-green-800 border-green-300">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Success</AlertTitle>
+          <AlertDescription>{successMessage}</AlertDescription>
+        </Alert>
+      )}
 
+      {errorMessage && (
+        <Alert variant="destructive" className="mt-4">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Error</AlertTitle>
+          <AlertDescription>{errorMessage}</AlertDescription>
+        </Alert>
+      )}
+        </>
+  )
+}

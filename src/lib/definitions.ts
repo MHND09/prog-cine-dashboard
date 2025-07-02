@@ -1,16 +1,27 @@
 export type Movie={
-    id: string
+    id?: string
     name: string
-    year: number
+    year: string
     bigImage: string
     smallImage: string
     description: string
     genre: string
-    duration: number
-    imdbRating: number
-    rottenTomatoesRating: number
+    duration: string
+    imdbRating: string
+    rottenTomatoesRating: string
 }
-
+export interface imdbMovieResponse {
+    Title: string
+    Year: string
+    Runtime: string
+    Genre: string
+    Plot: string
+    Poster: string
+    Ratings: {
+        Source: string
+        Value: string
+    }[]
+}
 export type Showtime = {
     id: string
     date: Date

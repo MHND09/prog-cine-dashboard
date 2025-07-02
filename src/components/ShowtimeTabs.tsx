@@ -1,39 +1,60 @@
-'use client'
-
-import { useState, useEffect } from 'react'
-import { useSearchParams } from 'next/navigation'
+// ShowtimeTabs.tsx (Server Component)
+import { Movie, Showtime } from '@/lib/definitions'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ShowtimesList } from '@/components/ShowtimesList'
 import { AddShowtimeForm } from '@/components/AddShowtimeForm'
 import { EditShowtimeForm } from '@/components/EditShowtimeForm'
-import { Showtime } from '@/lib/definitions'
+import EditShowtimePage from './EditShowtimePage'
+import { initAdmin } from '@/utils/firebase'
+import { getFirestore } from 'firebase-admin/firestore'
+async function getMovies() {
+  await initAdmin();
+  const firestore = getFirestore();
+  const collectionRef = firestore.collection("movies")
+  const movCollectionSnap = await collectionRef.get();
+  const movieList = movCollectionSnap.docs.map(doc => ({
+    ...doc.data(),
+    id: doc.id
+  } as Movie))
+  return movieList
+}
 
-export function ShowtimeTabs({scheduleList, theaterId}:{scheduleList: Showtime[], theaterId: string}) {
-  const [activeTab, setActiveTab] = useState('all-showtimes')
-  const searchParams = useSearchParams();
-  const editShowtimeId = searchParams.get('edit')
-  useEffect(() => {
-    if (editShowtimeId) {
-      setActiveTab('edit-showtime')
-    }
-  }, [editShowtimeId])
+export default async function ShowtimeTabs({
+  scheduleList,
+  theaterId,
+  searchParams
+}: {
+  scheduleList: Showtime[],
+  theaterId: string
+  searchParams: { edit?: string }
+}) {
+  const editShowtimeId = searchParams.edit
+  const activeTab = editShowtimeId ? 'edit-showtime' : 'all-showtimes'
+  const movies = await getMovies()
+
   return (
-    <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+    <Tabs defaultValue={activeTab} className="w-full">
       <TabsList>
         <TabsTrigger value="all-showtimes">All Showtimes</TabsTrigger>
         <TabsTrigger value="add-showtime">Add Showtime</TabsTrigger>
-        {editShowtimeId && <TabsTrigger value="edit-showtime">Edit Showtime</TabsTrigger>}
       </TabsList>
       <TabsContent value="all-showtimes">
-        <ShowtimesList showtimes={scheduleList}/>
+        <ShowtimesList showtimes={scheduleList} />
       </TabsContent>
       <TabsContent value="add-showtime">
-        <AddShowtimeForm theaterId={theaterId}/>
+        <AddShowtimeForm theaterId={theaterId} movies={movies} />
       </TabsContent>
       {editShowtimeId && (
-        <TabsContent value="edit-showtime">
-          <EditShowtimeForm showtimeId={editShowtimeId} />
-        </TabsContent>
+        <>
+          <TabsList>
+            <TabsTrigger value="edit-showtime">Edit Showtime</TabsTrigger>
+          </TabsList>
+          <TabsContent value="edit-showtime">
+            <EditShowtimePage params={{
+              showtimeId:editShowtimeId
+            }} />
+          </TabsContent>
+        </>
       )}
     </Tabs>
   )

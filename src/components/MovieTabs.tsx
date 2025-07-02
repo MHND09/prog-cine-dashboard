@@ -1,30 +1,31 @@
-'use client'
-
-import { useState , useEffect} from 'react'
-import { useSearchParams } from 'next/navigation'
+import { Movie } from "@/lib/definitions"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { MovieList } from '@/components/MovieList'
 import { AddMovieForm } from '@/components/AddMovieForm'
-import { EditMovieForm } from './EditMovieForm'
-import { Movie } from "@/lib/definitions"
+import  EditMovieForm  from './EditMoviePage'
 
-export function MovieTabs({ movieList }: { movieList: Movie[] }) {
-  const [activeTab, setActiveTab] = useState('all-movies')
-  const searchParams = useSearchParams()
-  const editMovieId  = searchParams.get('edit')
-  useEffect(() => {
-    if (editMovieId) {
-      setActiveTab('edit-movie')
-    }
-  }, [editMovieId])
-
+export default function MovieTabs({
+  searchParams,
+  movieList,
+}: {
+  searchParams: { edit?: string }
+  movieList: Movie[]
+}) {
+  console.log(searchParams)
+  console.log("cooooooooooooool")
+  const editMovieId = searchParams?.edit
+  const activeTab = editMovieId ? "edit-movie" : "all-movies"
+  console.log(activeTab)
 
   return (
-    <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+    <Tabs defaultValue={activeTab} className="w-full" >
       <TabsList>
         <TabsTrigger value="all-movies">All Movies</TabsTrigger>
         <TabsTrigger value="add-movie">Add Movie</TabsTrigger>
-        {editMovieId && <TabsTrigger value="edit-movie">Edit Movie</TabsTrigger>}
+        {editMovieId && (
+          <TabsTrigger value="edit-movie">Edit Movie</TabsTrigger>
+        )
+          }
       </TabsList>
       <TabsContent value="all-movies">
         <MovieList movieList={movieList} />
@@ -34,10 +35,11 @@ export function MovieTabs({ movieList }: { movieList: Movie[] }) {
       </TabsContent>
       {editMovieId && (
         <TabsContent value="edit-movie">
-          <EditMovieForm movieId={editMovieId} />
+          <EditMovieForm params={{
+            movieId: editMovieId
+          }} />
         </TabsContent>
       )}
     </Tabs>
   )
 }
-
