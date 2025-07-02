@@ -5,7 +5,7 @@ import { ShowtimesList } from '@/components/ShowtimesList'
 import { AddShowtimeForm } from '@/components/AddShowtimeForm'
 import { EditShowtimeForm } from '@/components/EditShowtimeForm'
 import EditShowtimePage from './EditShowtimePage'
-import { initAdmin } from '@/config/firebase'
+import { initAdmin } from '@/utils/firebase'
 import { getFirestore } from 'firebase-admin/firestore'
 async function getMovies() {
   await initAdmin();
@@ -46,7 +46,6 @@ export default async function ShowtimeTabs({
       </TabsContent>
       {editShowtimeId && (
         <>
-          {/* Optional tab button if desired */}
           <TabsList>
             <TabsTrigger value="edit-showtime">Edit Showtime</TabsTrigger>
           </TabsList>

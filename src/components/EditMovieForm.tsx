@@ -8,6 +8,8 @@ import { updateMovie } from '@/actions/actions'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
+import { AlertCircle } from 'lucide-react'
+import { Alert, AlertTitle, AlertDescription } from './ui/alert'
 
 type EditMovieFormProps = {
   movieId: string
@@ -15,17 +17,27 @@ type EditMovieFormProps = {
 }
 
 export function EditMovieForm({ movieId, movie }: EditMovieFormProps) {
-  const { register, handleSubmit, formState: { errors } } = useForm<Movie>({
+  const { register, handleSubmit,reset, formState: { errors } } = useForm<Movie>({
     defaultValues: movie
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [successMessage, setSuccessMessage] = useState<string | null>(null)
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const router = useRouter()
 
   const onSubmit = async (data: Movie) => {
     setIsSubmitting(true)
-    await updateMovie(movieId, data)
+    setSuccessMessage(null)
+    setErrorMessage(null)
+    const {error} = await updateMovie(movieId, data)
+    if (error) {
+      setErrorMessage('An error occurred while updating the movie. Please try again. If the problem persists, contact support.')
+    }
+    else{
+      setSuccessMessage('Movie updated successfully')
+      reset()
+    }
     setIsSubmitting(false)
-    router.push('/movies')
   }
 
   const handleCancel = () => {
@@ -33,6 +45,8 @@ export function EditMovieForm({ movieId, movie }: EditMovieFormProps) {
   }
 
   return (
+    <>
+    
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <Input {...register('name', { required: 'Movie name is required' })} placeholder="Movie Name" />
             {errors.name && <p className="text-red-500">{errors.name.message}</p>}
@@ -70,5 +84,21 @@ export function EditMovieForm({ movieId, movie }: EditMovieFormProps) {
                 </Button>
             </div>
         </form>
+        {successMessage && (
+        <Alert variant="default" className="mt-4 bg-green-100 text-green-800 border-green-300">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Success</AlertTitle>
+          <AlertDescription>{successMessage}</AlertDescription>
+        </Alert>
+      )}
+
+      {errorMessage && (
+        <Alert variant="destructive" className="mt-4">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Error</AlertTitle>
+          <AlertDescription>{errorMessage}</AlertDescription>
+        </Alert>
+      )}
+        </>
   )
 }

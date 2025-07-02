@@ -14,6 +14,7 @@ export function createFirebaseAdminApp(params: FirebaseAdminAppParams) {
   const privateKey = formatPrivateKey(params.privateKey);
 
   if (admin.apps.length > 0) {
+    console.log("thers's an app running")
     return admin.app();
   }
 
@@ -23,6 +24,7 @@ export function createFirebaseAdminApp(params: FirebaseAdminAppParams) {
     privateKey,
   });
 
+  console.log("creating a new app");
   return admin.initializeApp({
     credential: cert,
     projectId: params.projectId,

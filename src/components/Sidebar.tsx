@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { Home, Film, Calendar } from 'lucide-react'
+import { Home, Film, Calendar, Bell } from 'lucide-react'
 
 export function Sidebar() {
   return (
@@ -17,6 +17,10 @@ export function Sidebar() {
           <Calendar className="inline-block mr-2" size={20} />
           Showtimes
         </Link>
+        <Link href="/notifications" className="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 hover:text-white">
+          <Bell className="inline-block mr-2" size={20} />
+        Notifications
+          </Link>
       </nav>
     </div>
   )

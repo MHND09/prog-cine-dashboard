@@ -16,6 +16,7 @@ const SearchMovie = async (props: {
 
   return (
     <div className="search-page">
+      
       <SearchBar />
       <MovieList query={query} currentPage={parseInt(currentPage)} />
       {query &&

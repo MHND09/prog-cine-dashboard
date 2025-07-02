@@ -3,6 +3,7 @@ import Link from "next/link";
 import { searchImdbMovieByName, imdbMovieRes } from './loaders';
 import Image  from "next/image";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import Linkos from "@/components/ui/molecules/linkos";
 const MovieList = async ({
     query,
     currentPage,
@@ -33,7 +34,7 @@ const MovieList = async ({
         {
           searchedMovies.length > 0 && (
             searchedMovies.map((item:imdbMovieRes, index:any) => (
-            <Card key={index}>
+            <Card key={index} className='relative'>
               <CardHeader>
               {
                   item.Poster && item.Poster != "N/A" ?
@@ -49,7 +50,7 @@ const MovieList = async ({
                 <CardTitle>{item.Title}</CardTitle>
                 <CardDescription>{item.Year}</CardDescription>
               </CardContent>
-
+              <Linkos imdbId={item.imdbID} />
             </Card>
           )))  
         }

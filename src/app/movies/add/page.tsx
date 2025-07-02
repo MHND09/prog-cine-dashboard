@@ -5,13 +5,16 @@ import SearchMovie from "./(searchMovie)/SearchMovie"
 
 export default async function AddMoviesPage(props: {
   searchParams?:
-  Promise<{ query?: string; page?: string; }>;
+  Promise<{ query?: string; page?: string; movieData?:string }>;
 }) {
+
   const searchParams = await props.searchParams
   let mainTab = "manual"
   if (searchParams?.query){
     mainTab = "name"
   }
+  const movieData = searchParams?.movieData ? JSON.parse(decodeURIComponent(searchParams.movieData)) : null
+  console.log("this rocks ig ", movieData)
   return (
     <div className="w-full min-h-screen p-8 bg-gray-50">
       <div className="mx-auto space-y-8">
@@ -25,7 +28,7 @@ export default async function AddMoviesPage(props: {
           {/* Manual Tab */}
           <TabsContent value="manual" className="space-y-4">
             <h2 className="text-xl font-semibold">Manually Add a Movie</h2>
-            <AddMovieForm />
+            <AddMovieForm initialData={movieData}/>
           </TabsContent>
           {/* IMDb Tab */}
           <TabsContent value="imdb" className="space-y-6">

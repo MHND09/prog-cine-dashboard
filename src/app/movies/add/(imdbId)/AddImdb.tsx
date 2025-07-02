@@ -6,7 +6,8 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { AlertCircle } from "lucide-react"
-import { set } from "date-fns"
+import { useRouter, useSearchParams } from "next/navigation"
+import { Movie } from "@/lib/definitions"
 
 const addMovieImdb = async (imdbId: string) => {
     // Simulating different error scenarios
@@ -21,55 +22,74 @@ const addMovieImdb = async (imdbId: string) => {
     // If no error, the movie is successfully added
     return Promise.resolve()
 }
-interface MovieData {
-    Title?: string
-    Year?: string
-    imdbID?: string
-    Error?: string
+interface imdbMovieResponse {
+    Title: string
+    Year: string
+    Runtime: string
+    Genre: string
+    Plot: string
+    Poster: string
+    Ratings: {
+        Source: string
+        Value: string
+    }[]
 }
 
 const AddImdb = () => {
+    const router = useRouter()
+    const searchParams = useSearchParams()
     const {
         register,
         handleSubmit,
         formState: { errors },
     } = useForm<{ imdbId: string }>()
     const [isSubmitting, setIsSubmitting] = useState(false)
-    const [movieData, setMovieData] = useState<MovieData | null>(null)
+    const [movieData, setMovieData] = useState<imdbMovieResponse | null>(null)
     const [searchError, setSearchError] = useState<string | null>(null)
     const [addMovieError, setAddMovieError] = useState<string | null>(null)
     const [successMessage, setSuccessMessage] = useState<string | null>(null)
 
     const onSubmit = async (data: { imdbId: string }) => {
-        setIsSubmitting(true)
-        setAddMovieError(null) // Clear previous errors
-        setSuccessMessage(null) // Clear previous success message
-        try {
-            await addMovieImdb(data.imdbId)
-            setSuccessMessage(`"${movieData?.Title}" has been successfully added to your collection.`)
-            console.log("Movie added successfully")
-            setMovieData(null) // Clear movie data after successful addition
-        } catch (error) {
-            if (error instanceof Error) {
-                switch (error.message) {
-                    case "MOVIE_EXISTS":
-                        setAddMovieError("This movie already exists in your collection.")
-                        break
-                    case "INVALID_IMDB_ID":
-                        setAddMovieError("The provided IMDb ID is invalid.")
-                        break
-                    case "API_ERROR":
-                        setAddMovieError("There was an error communicating with the movie database. Please try again later.")
-                        break
-                    default:
-                        setAddMovieError("An unexpected error occurred. Please try again.")
-                }
-            } else {
-                setAddMovieError("An unexpected error occurred. Please try again.")
-            }
-        } finally {
-            setIsSubmitting(false)
+        const params = new URLSearchParams(searchParams)
+        if (!movieData) {
+            return
         }
+        const { Title, Year, Plot, Runtime, Genre, Poster, Ratings } = movieData
+
+        const imdbRatingObj = Ratings?.find(r => r.Source === "Internet Movie Database")
+        console.log("hello")
+        console.log(imdbRatingObj)
+        const imdbRatingValue = imdbRatingObj ? imdbRatingObj.Value.split('/')[0] : "N/A"
+
+        const rottenTomatoesObj = Ratings?.find(r => r.Source === "Rotten Tomatoes")
+        const rottenTomatoesValue = rottenTomatoesObj
+            ? rottenTomatoesObj.Value.replace('%', '')
+            : "N/A"
+
+        const runtimeNumber = Runtime.split(' ')[0];
+        const movie: Movie = {
+            name: Title,
+            year: Year,
+            description: Plot,
+            duration: runtimeNumber,
+            genre: Genre,
+            bigImage: Poster,
+            smallImage: Poster,
+            imdbRating: imdbRatingValue,
+            rottenTomatoesRating: rottenTomatoesValue,
+        }
+        console.log("movie: ", movie)
+        params.forEach((_, key) => {
+            params.delete(key)
+        })
+        params.set("movieData",encodeURIComponent(JSON.stringify(movie)))
+        router.push(`?${params.toString()}`)
+        setTimeout(
+            ()=>{
+                window.location.reload()
+            }, 1500
+        )
+        
     }
 
     const fetchMovieByImdbId = async (imdbId: string) => {
@@ -86,7 +106,7 @@ const AddImdb = () => {
                 setSearchError(data.Error || "Failed to fetch movie data")
             }
         } catch (error) {
-            
+
             setSearchError("An error occurred while fetching the movie")
         }
     }
