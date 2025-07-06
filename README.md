@@ -2,6 +2,8 @@
 
 A comprehensive dashboard application designed for theater owners to manage their content for a mobile app [github](https://github.com/Abd-Elhakim-Arabet/Prog-Cine). This web-based management system allows theater owners to efficiently handle their movie listings, showtimes, and other content that will be displayed in their mobile application.
 
+live demo available [here](https://prog-cine-dashboard.vercel.app) you can use demo credentials given below
+
 ## Project Demo
 
 
