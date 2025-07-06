@@ -2,11 +2,19 @@
 
 A comprehensive dashboard application designed for theater owners to manage their content for a mobile app [github](https://github.com/Abd-Elhakim-Arabet/Prog-Cine). This web-based management system allows theater owners to efficiently handle their movie listings, showtimes, and other content that will be displayed in their mobile application.
 
+## Project Demo
+
+
+https://github.com/user-attachments/assets/0def8871-dbfa-4f37-abf7-23e94a1a2114
+
+
+
+
 ## Project Overview
 
 This dashboard serves as the backend management interface for theater owners, providing them with tools to:
 
-- **Movie Management**: Add, edit, and remove movies from their theater listings with integration imdb database.
+- **Movie Management**: Add, edit, and remove movies from their theater listings, integrating with the IMDb database.
 - **Showtime Management**: Create and manage movie showtimes and schedules
 - **Content Control**: Full control over what content appears in their mobile app
 - **User-Friendly Interface**: Intuitive design built with modern web technologies
