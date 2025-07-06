@@ -73,16 +73,16 @@ body {
 
 @layer utilities {
   .search-form {
-    @apply max-w-3xl w-full min-h-[80px] bg-white border-[5px] border-blue-500 rounded-[80px] text-[24px] mt-8 px-5 flex flex-row items-center gap-5;
+    @apply max-w-3xl w-full min-h-[60px] bg-white border-[5px] border-zinc-950 rounded-[20px] text-[20px] mt-8 px-5 flex flex-row items-center gap-5;
   }
 
   .search-input {
-    @apply flex-1 font-bold placeholder:font-semibold placeholder:text-[24px]
+    @apply flex-1 font-bold placeholder:font-semibold placeholder:text-[20px]
      w-full h-auto outline-none;
   }
 
   .search-btn {
-    @apply size-[50px] rounded-full bg-blue-500 flex justify-center items-center !important;
+    @apply size-[40px] rounded-full bg-zinc-900 flex justify-center items-center !important;
   }
 
   .document-list-container {
