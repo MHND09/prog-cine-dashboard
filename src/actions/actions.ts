@@ -126,10 +126,6 @@ async function sendMessage(formData: FormData) {
       }
     };
     console.log("message", message);
-    await initAdmin();
-    const messageS =  getMessaging();
-    const response =  await messageS.send(message)
-    console.log('Successfully sent message:', response);
     revalidatePath('/notifications');
     return { error: null };
   } catch (error) {

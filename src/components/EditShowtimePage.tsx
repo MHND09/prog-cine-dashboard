@@ -1,10 +1,7 @@
-import { initAdmin } from "@/utils/firebase"
-import { getFirestore } from "firebase-admin/firestore"
 import { format } from "date-fns"
 import { EditShowtimeForm } from "./EditShowtimeForm"
 import { Showtime, Movie } from "@/lib/definitions"
 import { createClient } from "@/utils/supabase/server"
-import { firestore } from "firebase-admin"
 import { AlertCircle } from "lucide-react"
 import { Alert, AlertTitle, AlertDescription } from "./ui/alert"
 
