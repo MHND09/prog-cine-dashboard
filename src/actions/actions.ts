@@ -1,12 +1,8 @@
 'use server';
 
-import { getFirestore, Timestamp } from "firebase-admin/firestore";
-import { getMessaging } from "firebase-admin/messaging";
-//import { addDoc, collection, deleteDoc, doc, Timestamp, updateDoc } from "firebase/firestore";
 import { Movie } from "@/lib/definitions";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/utils/supabase/server";
-import { initAdmin } from "@/utils/firebase";
 
 type ShowtimeFormData = {
   movieId: string
