@@ -1,7 +1,7 @@
 
 import ShowtimeTabs from '@/components/ShowtimeTabs';
-import { initAdmin } from "@/utils/firebase";
-import { getFirestore, Timestamp } from "firebase-admin/firestore";
+// import { initAdmin } from "@/utils/firebase";
+// import { getFirestore, Timestamp } from "firebase-admin/firestore";
 import { Showtime } from '@/lib/definitions';
 /* import { and, collection, doc, getDoc, getDocs, query, Timestamp, where } from 'firebase/firestore'; */
 import { clerkClient } from '@clerk/nextjs/server'
