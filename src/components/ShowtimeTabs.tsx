@@ -1,23 +1,10 @@
 // ShowtimeTabs.tsx (Server Component)
-import { Movie, Showtime } from '@/lib/definitions'
+import { Showtime } from '@/lib/definitions'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ShowtimesList } from '@/components/ShowtimesList'
 import { AddShowtimeForm } from '@/components/AddShowtimeForm'
-import { EditShowtimeForm } from '@/components/EditShowtimeForm'
 import EditShowtimePage from './EditShowtimePage'
-import { initAdmin } from '@/utils/firebase'
-import { getFirestore } from 'firebase-admin/firestore'
-async function getMovies() {
-  await initAdmin();
-  const firestore = getFirestore();
-  const collectionRef = firestore.collection("movies")
-  const movCollectionSnap = await collectionRef.get();
-  const movieList = movCollectionSnap.docs.map(doc => ({
-    ...doc.data(),
-    id: doc.id
-  } as Movie))
-  return movieList
-}
+import { getMovies } from './EditShowtimePage'
 
 export default async function ShowtimeTabs({
   scheduleList,
@@ -30,7 +17,7 @@ export default async function ShowtimeTabs({
 }) {
   const editShowtimeId = searchParams.edit
   const activeTab = editShowtimeId ? 'edit-showtime' : 'all-showtimes'
-  const movies = await getMovies()
+  const { movies } = await getMovies()
 
   return (
     <Tabs defaultValue={activeTab} className="w-full">
@@ -42,7 +29,7 @@ export default async function ShowtimeTabs({
         <ShowtimesList showtimes={scheduleList} />
       </TabsContent>
       <TabsContent value="add-showtime">
-        <AddShowtimeForm theaterId={theaterId} movies={movies} />
+        <AddShowtimeForm theaterId={theaterId} movies={movies ?? []} />
       </TabsContent>
       {editShowtimeId && (
         <>
